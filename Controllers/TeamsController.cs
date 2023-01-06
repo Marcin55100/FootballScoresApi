@@ -6,27 +6,27 @@ namespace FootballScoresApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class LeagueController : ControllerBase
+    public class TeamsController : ControllerBase
     {
-        private readonly ILogger<LeagueController> _logger;
+        private readonly ILogger<TeamsController> _logger;
         private readonly IScoresApiProvider _scoresApiProvider;
 
-        public LeagueController(ILogger<LeagueController> logger, IScoresApiProvider scoresApiProvider)
+        public TeamsController(ILogger<TeamsController> logger, IScoresApiProvider scoresApiProvider)
         {
             _logger = logger;
             _scoresApiProvider = scoresApiProvider;
         }
 
         [HttpGet]
-        public async Task<List<Team>> GetAllTeams()
+        public async Task<List<Team>> GetAll()
         {
             return await _scoresApiProvider.GetAllTeams();
         }
 
         [HttpGet("fake")]
-        public List<Team> GetFakeTeams()
+        public List<Team> GetFake()
         {
-            _logger.LogInformation($"[{nameof(LeagueController)}] Fake teams being fetched");
+            _logger.LogInformation($"[{nameof(TeamsController)}] Fake teams being fetched");
             return _scoresApiProvider.GetFakeTeams();
         }
     }
