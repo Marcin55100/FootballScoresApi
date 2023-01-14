@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FootballScoresApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class TeamsController : ControllerBase
     {
         private readonly ILogger<TeamsController> _logger;
