@@ -18,13 +18,13 @@ namespace FootballScoresApi.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Team>> GetAll()
+        public async Task<List<TeamData>> GetAll()
         {
             return await _scoresApiProvider.GetAllTeams();
         }
 
         [HttpGet("fake")]
-        public List<Team> GetFake()
+        public List<TeamData> GetFake()
         {
             _logger.LogInformation($"[{nameof(TeamsController)}] Fake teams being fetched");
             return _scoresApiProvider.GetFakeTeams();

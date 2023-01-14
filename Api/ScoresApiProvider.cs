@@ -8,31 +8,62 @@ namespace FootballScoresApi.Api
     public class ScoresApiProvider : IScoresApiProvider
     {
         private const string ALL_TEAMS_ENDP = "https://api-football-v1.p.rapidapi.com/v3/teams?league=39&season=2020";
+        private const string STANDINGS_ENDP = "https://api-football-v1.p.rapidapi.com/v3/standings?season=2022&league=39";
         private readonly IHttpApiProvider _httpApiProvider;
+        private readonly ILogger<ScoresApiProvider> _logger;
 
-        public ScoresApiProvider(IHttpApiProvider httpApiProvider)
+        public ScoresApiProvider(IHttpApiProvider httpApiProvider, ILogger<ScoresApiProvider> logger)
         {
+            _logger = logger;
             _httpApiProvider = httpApiProvider;
         }
 
-        public List<Team> GetFakeTeams()
+        public List<TeamData> GetFakeTeams()
         {
-            return new List<Team>()
+            return new List<TeamData>()
             {
-                new Team("Arsenal", 1),
-                new Team("Liverpool", 2),
-                new Team("Manchester United", 3)
+                new TeamData("Arsenal", 1, 30),
+                new TeamData("Liverpool", 2, 20),
+                new TeamData("Manchester United", 3, 10)
             };
         }
 
-        public async Task<List<Team>> GetAllTeams()
+        public async Task<List<TeamData>> GetAllTeams()
         {
-            var list = new List<Team>();
-            var response = await _httpApiProvider.GetResponse(ALL_TEAMS_ENDP);
-            var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
+            var list = new List<TeamData>();
+            try
+            {
+                var response = await _httpApiProvider.GetResponse(ALL_TEAMS_ENDP);
+                var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
 
-            teamsList?.response.ToList().ForEach(t => list.Add(new Team(t.team.name, t.team.id)));
+                teamsList?.response?.ToList().ForEach(t => list.Add(new TeamData(t.team.name, t.team.id)));
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Error");
+            }
+            return list;
+        }
 
+        public async Task<List<TeamData>> GetAllStandings()
+        {
+            var list = new List<TeamData>();
+            try
+            {
+                var response = await _httpApiProvider.GetResponse(STANDINGS_ENDP);
+                var teamsList = JsonConvert.DeserializeObject<Standings>(response);
+
+                var league = teamsList?.response?.ToList().FirstOrDefault()?.league;
+
+                league?.standings?
+                    .FirstOrDefault()?
+                    .ToList()
+                    .ForEach(s => list.Add(new TeamData(s.team.name, s.rank, s.points)));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error");
+            }
             return list;
         }
     }

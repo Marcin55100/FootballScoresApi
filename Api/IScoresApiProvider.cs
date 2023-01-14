@@ -4,7 +4,8 @@ namespace FootballScoresApi.Api
 {
     public interface IScoresApiProvider
     {
-        Task<List<Team>> GetAllTeams();
-        List<Team> GetFakeTeams();
+        Task<List<TeamData>> GetAllStandings();
+        Task<List<TeamData>> GetAllTeams();
+        List<TeamData> GetFakeTeams();
     }
 }
