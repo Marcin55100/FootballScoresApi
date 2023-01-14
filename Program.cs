@@ -7,11 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IScoresApiProvider, ScoresApiProvider>();
 builder.Services.AddScoped<IHttpApiProvider, HttpApiProvider>();
+builder.Services.AddCors();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors();
 
 var app = builder.Build();
 
