@@ -22,5 +22,12 @@ namespace FootballScoresApi.Controllers
         {
             return await _scoresApiProvider.GetAllStandings();
         }
+
+        [HttpGet]
+        [Route("fixtures")]
+        public Fixture GetFixtureByDate(string team, DateTime dateTime)
+        {
+            return _scoresApiProvider.TryGetFixtureByDate(team, dateTime);
+        }
     }
 }
