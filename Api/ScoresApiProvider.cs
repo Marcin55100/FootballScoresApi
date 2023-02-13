@@ -8,7 +8,9 @@ namespace FootballScoresApi.Api
     public class ScoresApiProvider : IScoresApiProvider
     {
         private const string ALL_TEAMS_ENDP = "https://api-football-v1.p.rapidapi.com/v3/teams?league=39&season=2020";
+        private const string GET_ID_ENDP = $"https://api-football-v1.p.rapidapi.com/v3/teams?country={LEAGUE_ORIGIN}&name=";
         private const string STANDINGS_ENDP = "https://api-football-v1.p.rapidapi.com/v3/standings?season=2022&league=39";
+        private const string LEAGUE_ORIGIN = "England";
         private readonly IHttpApiProvider _httpApiProvider;
         private readonly ILogger<ScoresApiProvider> _logger;
 
@@ -44,6 +46,28 @@ namespace FootballScoresApi.Api
             }
             return list;
         }
+
+        public async Task<int?> GetTeamId(string name)
+        {
+            try
+            {
+                var response = await _httpApiProvider.GetResponse($"{GET_ID_ENDP}{name}");
+                var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
+                var id = teamsList?.response?.ToList().FirstOrDefault().team.id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error");
+            }
+            return null;
+        }
+
+        public Fixture TryGetFixtureByDate(string team, DateTime dateTime)
+        {
+            return new Fixture(true, "Chelsea FC");
+        }
+
 
         public async Task<List<TeamData>> GetAllStandings()
         {

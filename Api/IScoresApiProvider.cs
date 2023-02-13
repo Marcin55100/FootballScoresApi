@@ -7,5 +7,6 @@ namespace FootballScoresApi.Api
         Task<List<TeamData>> GetAllStandings();
         Task<List<TeamData>> GetAllTeams();
         List<TeamData> GetFakeTeams();
+        Fixture TryGetFixtureByDate(string team, DateTime dateTime);
     }
 }
