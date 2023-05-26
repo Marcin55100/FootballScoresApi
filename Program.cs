@@ -1,4 +1,5 @@
 using FootballScoresApi.Api;
+using FootballScoresApi.ErrorHandlers;
 using FootballScoresApi.Helpers;
 using FootballScoresApi.Logger;
 using Serilog;
@@ -32,6 +33,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.ConfigureExceptionHandler();
 
 app.UseHttpsRedirection();
 

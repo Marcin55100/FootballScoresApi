@@ -18,16 +18,21 @@ namespace FootballScoresApi.Controllers
         }
 
         [HttpGet]
-        public async Task<List<TeamData>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return await _scoresApiProvider.GetAllStandings();
+            return Ok(await _scoresApiProvider.GetAllStandings());
         }
 
         [HttpGet]
         [Route("fixtures")]
-        public Fixture GetFixtureByDate(string team, DateTime dateTime)
+        public async Task<IActionResult> GetFixtureByDate(string team, DateTime dateTime)
         {
-            return _scoresApiProvider.TryGetFixtureByDate(team, dateTime);
+            var fixtures = await _scoresApiProvider.TryGetFixtureByDate(team, dateTime);
+            if (fixtures == null)
+            {
+                return NotFound();
+            }
+            return Ok(fixtures);
         }
     }
 }

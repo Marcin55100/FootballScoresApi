@@ -10,6 +10,7 @@ namespace FootballScoresApi.Api
         private const string ALL_TEAMS_ENDP = "https://api-football-v1.p.rapidapi.com/v3/teams?league=39&season=2020";
         private const string GET_ID_ENDP = $"https://api-football-v1.p.rapidapi.com/v3/teams?country={LEAGUE_ORIGIN}&name=";
         private const string STANDINGS_ENDP = "https://api-football-v1.p.rapidapi.com/v3/standings?season=2022&league=39";
+        private const string FIXTURE_FOR_DATE_ENDP = "https://api-football-v1.p.rapidapi.com/v3/fixtures?season=2022&league=39";
         private const string LEAGUE_ORIGIN = "England";
         private readonly IHttpApiProvider _httpApiProvider;
         private readonly ILogger<ScoresApiProvider> _logger;
@@ -33,39 +34,41 @@ namespace FootballScoresApi.Api
         public async Task<List<TeamData>> GetAllTeams()
         {
             var list = new List<TeamData>();
-            try
-            {
-                var response = await _httpApiProvider.GetResponse(ALL_TEAMS_ENDP);
-                var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
+            var response = await _httpApiProvider.GetResponse(ALL_TEAMS_ENDP);
+            var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
 
-                teamsList?.response?.ToList().ForEach(t => list.Add(new TeamData(t.team.name, t.team.id)));
-            }
-            catch (Exception ex) 
-            {
-                _logger.LogError(ex, "Error");
-            }
+            teamsList?.response?
+                .ToList()?
+                .ForEach(t => list.Add(new TeamData(t.team.name, t.team.id)));
             return list;
         }
 
         public async Task<int?> GetTeamId(string name)
         {
-            try
-            {
-                var response = await _httpApiProvider.GetResponse($"{GET_ID_ENDP}{name}");
-                var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
-                var id = teamsList?.response?.ToList().FirstOrDefault().team.id;
-                return id;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error");
-            }
-            return null;
+            var response = await _httpApiProvider.GetResponse($"{GET_ID_ENDP}{name}");
+            var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
+            return teamsList?.response?.ToList()?.FirstOrDefault()?.team?.id;
         }
 
-        public Fixture TryGetFixtureByDate(string team, DateTime dateTime)
+        public async Task<Fixture> TryGetFixtureByDate(string team, DateTime dateTime)
         {
-            return new Fixture(true, "Chelsea FC");
+            var parsedData = dateTime.ToString("yyyy-MM-dd");
+            var teamId = await GetTeamId(team);
+            if (teamId == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            var response = await _httpApiProvider.GetResponse($"{FIXTURE_FOR_DATE_ENDP}&team={teamId}&date={parsedData}");
+            var fixtures = JsonConvert.DeserializeObject<Fixtures>(response);
+
+            var teams = fixtures?.response?.FirstOrDefault()?.teams;
+            if (teams != null)
+            {
+                var isHome = teams.home.id == teamId;
+                return new Fixture(isHome, isHome ? teams.away.name : teams.home.name);
+            }
+            return null;
         }
 
 
