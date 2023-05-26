@@ -1,7 +1,13 @@
 using FootballScoresApi.Api;
 using FootballScoresApi.Helpers;
+using FootballScoresApi.Logger;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Logger
+LoggerCreator.CreateLogger();
+builder.Host.UseSerilog();
 
 // Add services to the container.
 
