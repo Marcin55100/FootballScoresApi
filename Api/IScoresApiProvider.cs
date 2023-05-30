@@ -9,5 +9,6 @@ namespace FootballScoresApi.Api
         Task<List<TeamData>> GetAllTeams();
         List<TeamData> GetFakeTeams();
         Task<Fixture> TryGetFixtureByDate(string team, DateTime dateTime);
+        Task<List<Fixture>> TryGetLastFixtures(string team, int numberOfMatches);
     }
 }
