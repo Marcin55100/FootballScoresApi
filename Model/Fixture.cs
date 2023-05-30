@@ -2,13 +2,17 @@
 {
     public class Fixture
     {
-        public Fixture(bool isHome, string opponent)
+        public Fixture(string team, string opponent, bool isHome, DateTime date)
         {
-            IsHome = isHome;
+            Team = team;
             Opponent = opponent;
+            IsHome = isHome;
+            Date = date;
         }
 
-        public bool IsHome { get; set; }
+        public string Team { get; set; }
         public string Opponent { get; set; }
+        public bool IsHome { get; set; }
+        public DateTime Date { get; set; }
     }
 }
