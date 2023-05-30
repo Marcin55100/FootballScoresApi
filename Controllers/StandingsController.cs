@@ -34,5 +34,17 @@ namespace FootballScoresApi.Controllers
             }
             return Ok(fixtures);
         }
+
+        [HttpGet]
+        [Route("fixtures/last")]
+        public async Task<IActionResult> GetFixtureByDate(string team, int numberOfMatches)
+        {
+            var fixtures = await _scoresApiProvider.TryGetLastFixtures(team, numberOfMatches);
+            if (fixtures == null)
+            {
+                return NotFound();
+            }
+            return Ok(fixtures);
+        }
     }
 }

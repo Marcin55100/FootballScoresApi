@@ -13,6 +13,7 @@ namespace FootballScoresApi.Api
         private const string GET_ID_ENDP = $"{BASIC_URL}/teams?country={LEAGUE_ORIGIN}&name=";
         private const string STANDINGS_ENDP = $"{BASIC_URL}/standings?season=2022&league=39";
         private const string FIXTURE_FOR_DATE_ENDP = $"{BASIC_URL}/fixtures?season=2022&league=39";
+        private const string LAST_FIXTURES_ENDP = $"{BASIC_URL}/fixtures?league=39";
         private const string PLAYERS_ENDP = $"{BASIC_URL}/players/squads";
         private const string LEAGUE_ORIGIN = "England";
 
@@ -75,6 +76,26 @@ namespace FootballScoresApi.Api
                 return new Fixture(isHome, isHome ? teams.away.name : teams.home.name);
             }
             return null;
+        }
+
+        public async Task<List<Fixture>> TryGetLastFixtures(string team, int numberOfMatches)
+        {
+            var teamId = await GetTeamId(team);
+            if (teamId == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            var fixtureList = new List<Fixture>();
+            var response = await _httpApiProvider.GetResponse($"{LAST_FIXTURES_ENDP}&team={teamId}&last={numberOfMatches}");
+            var fixtures = JsonConvert.DeserializeObject<Fixtures>(response);
+
+            fixtures?.response?.ToList()?.ForEach(f =>
+            {
+                var isHome = f.teams.home.id == teamId;
+                fixtureList.Add(new Fixture(isHome, isHome ? f.teams.away.name : f.teams.home.name));
+            });
+            return fixtureList.Any() ? fixtureList : null;
         }
 
 
