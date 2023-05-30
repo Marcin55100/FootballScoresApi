@@ -4,6 +4,7 @@ namespace FootballScoresApi.Api
 {
     public interface IScoresApiProvider
     {
+        Task<List<PlayerDto>> GetAllPlayers(string teamName);
         Task<List<TeamData>> GetAllStandings();
         Task<List<TeamData>> GetAllTeams();
         List<TeamData> GetFakeTeams();
