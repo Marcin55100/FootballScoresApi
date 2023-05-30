@@ -1,4 +1,5 @@
-﻿using FootballScoresApi.Api.Model;
+﻿using AutoMapper;
+using FootballScoresApi.Api.Model;
 using FootballScoresApi.Helpers;
 using FootballScoresApi.Model;
 using Newtonsoft.Json;
@@ -7,17 +8,22 @@ namespace FootballScoresApi.Api
 {
     public class ScoresApiProvider : IScoresApiProvider
     {
-        private const string ALL_TEAMS_ENDP = "https://api-football-v1.p.rapidapi.com/v3/teams?league=39&season=2020";
-        private const string GET_ID_ENDP = $"https://api-football-v1.p.rapidapi.com/v3/teams?country={LEAGUE_ORIGIN}&name=";
-        private const string STANDINGS_ENDP = "https://api-football-v1.p.rapidapi.com/v3/standings?season=2022&league=39";
-        private const string FIXTURE_FOR_DATE_ENDP = "https://api-football-v1.p.rapidapi.com/v3/fixtures?season=2022&league=39";
+        private const string BASIC_URL = "https://api-football-v1.p.rapidapi.com/v3";
+        private const string ALL_TEAMS_ENDP = $"{BASIC_URL}/teams?league=39&season=2020";
+        private const string GET_ID_ENDP = $"{BASIC_URL}/teams?country={LEAGUE_ORIGIN}&name=";
+        private const string STANDINGS_ENDP = $"{BASIC_URL}/standings?season=2022&league=39";
+        private const string FIXTURE_FOR_DATE_ENDP = $"{BASIC_URL}/fixtures?season=2022&league=39";
+        private const string PLAYERS_ENDP = $"{BASIC_URL}/players/squads";
         private const string LEAGUE_ORIGIN = "England";
+
         private readonly IHttpApiProvider _httpApiProvider;
         private readonly ILogger<ScoresApiProvider> _logger;
+        private readonly IMapper _mapper;
 
-        public ScoresApiProvider(IHttpApiProvider httpApiProvider, ILogger<ScoresApiProvider> logger)
+        public ScoresApiProvider(IHttpApiProvider httpApiProvider, ILogger<ScoresApiProvider> logger, IMapper mapper)
         {
             _logger = logger;
+            _mapper = mapper;
             _httpApiProvider = httpApiProvider;
         }
 
@@ -43,7 +49,7 @@ namespace FootballScoresApi.Api
             return list;
         }
 
-        public async Task<int?> GetTeamId(string name)
+        private async Task<int?> GetTeamId(string name)
         {
             var response = await _httpApiProvider.GetResponse($"{GET_ID_ENDP}{name}");
             var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
@@ -52,13 +58,13 @@ namespace FootballScoresApi.Api
 
         public async Task<Fixture> TryGetFixtureByDate(string team, DateTime dateTime)
         {
-            var parsedData = dateTime.ToString("yyyy-MM-dd");
             var teamId = await GetTeamId(team);
             if (teamId == null)
             {
                 throw new KeyNotFoundException();
             }
 
+            var parsedData = dateTime.ToString("yyyy-MM-dd");
             var response = await _httpApiProvider.GetResponse($"{FIXTURE_FOR_DATE_ENDP}&team={teamId}&date={parsedData}");
             var fixtures = JsonConvert.DeserializeObject<Fixtures>(response);
 
@@ -75,23 +81,28 @@ namespace FootballScoresApi.Api
         public async Task<List<TeamData>> GetAllStandings()
         {
             var list = new List<TeamData>();
-            try
-            {
-                var response = await _httpApiProvider.GetResponse(STANDINGS_ENDP);
-                var teamsList = JsonConvert.DeserializeObject<Standings>(response);
+            var response = await _httpApiProvider.GetResponse(STANDINGS_ENDP);
+            var teamsList = JsonConvert.DeserializeObject<Standings>(response);
 
-                var league = teamsList?.response?.ToList().FirstOrDefault()?.league;
+            var league = teamsList?.response?.ToList().FirstOrDefault()?.league;
 
-                league?.standings?
-                    .FirstOrDefault()?
-                    .ToList()
-                    .ForEach(s => list.Add(new TeamData(s.team.name, s.rank, s.points)));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error");
-            }
+            league?.standings?
+                .FirstOrDefault()?
+                .ToList()?
+                .ForEach(s => list.Add(new TeamData(s.team.name, s.rank, s.points)));
             return list;
+        }
+
+        public async Task<List<PlayerDto>> GetAllPlayers(string teamName)
+        {
+            var response = await _httpApiProvider.GetResponse($"{PLAYERS_ENDP}?team=42");
+            var squads = JsonConvert.DeserializeObject<Squads>(response);
+            var players = squads.response?.FirstOrDefault()?.players;
+            if (players?.Any() ?? false)
+            {
+                return players.Select(p => _mapper.Map<PlayerDto>(p)).ToList();
+            }
+            return null;
         }
     }
 }
