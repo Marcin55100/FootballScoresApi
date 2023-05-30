@@ -73,7 +73,7 @@ namespace FootballScoresApi.Api
             if (teams != null)
             {
                 var isHome = teams.home.id == teamId;
-                return new Fixture(isHome, isHome ? teams.away.name : teams.home.name);
+                return new Fixture(team, isHome ? teams.away.name : teams.home.name, isHome, dateTime);
             }
             return null;
         }
@@ -93,7 +93,7 @@ namespace FootballScoresApi.Api
             fixtures?.response?.ToList()?.ForEach(f =>
             {
                 var isHome = f.teams.home.id == teamId;
-                fixtureList.Add(new Fixture(isHome, isHome ? f.teams.away.name : f.teams.home.name));
+                fixtureList.Add(new Fixture(team, isHome ? f.teams.away.name : f.teams.home.name, isHome, f.fixture.date));
             });
             return fixtureList.Any() ? fixtureList : null;
         }
