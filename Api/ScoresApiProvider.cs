@@ -1,65 +1,33 @@
 ﻿using AutoMapper;
 using FootballScoresApi.Api.Model;
+using FootballScoresApi.Consts;
 using FootballScoresApi.Helpers;
 using FootballScoresApi.Model;
+using FootballScoresApi.Services;
 using Newtonsoft.Json;
 
 namespace FootballScoresApi.Api
 {
     public class ScoresApiProvider : IScoresApiProvider
     {
-        private const string BASIC_URL = "https://api-football-v1.p.rapidapi.com/v3";
-        private const string ALL_TEAMS_ENDP = $"{BASIC_URL}/teams?league=39&season=2020";
-        private const string GET_ID_ENDP = $"{BASIC_URL}/teams?country={LEAGUE_ORIGIN}&name=";
-        private const string STANDINGS_ENDP = $"{BASIC_URL}/standings?season=2023&league=39";
-        private const string FIXTURE_FOR_DATE_ENDP = $"{BASIC_URL}/fixtures?season=2023&league=39";
-        private const string LAST_FIXTURES_ENDP = $"{BASIC_URL}/fixtures?league=39";
-        private const string PLAYERS_ENDP = $"{BASIC_URL}/players/squads";
-        private const string LEAGUE_ORIGIN = "England";
+        private const string STANDINGS_ENDP = $"{GlobalConsts.BASIC_URL}/standings?season=2023&league=39";
+        private const string FIXTURE_FOR_DATE_ENDP = $"{GlobalConsts.BASIC_URL}/fixtures?season=2023&league=39";
+        private const string LAST_FIXTURES_ENDP = $"{GlobalConsts.BASIC_URL}/fixtures?league=39";
 
+        private readonly ITeamsService _teamsService;
         private readonly IHttpApiProvider _httpApiProvider;
         private readonly ILogger<ScoresApiProvider> _logger;
-        private readonly IMapper _mapper;
 
-        public ScoresApiProvider(IHttpApiProvider httpApiProvider, ILogger<ScoresApiProvider> logger, IMapper mapper)
+        public ScoresApiProvider(IHttpApiProvider httpApiProvider, ILogger<ScoresApiProvider> logger, ITeamsService teamsService)
         {
             _logger = logger;
-            _mapper = mapper;
+            _teamsService = teamsService;
             _httpApiProvider = httpApiProvider;
-        }
-
-        public List<TeamData> GetFakeTeams()
-        {
-            return new List<TeamData>()
-            {
-                new TeamData("Arsenal", 1, 30),
-                new TeamData("Liverpool", 2, 20),
-                new TeamData("Manchester United", 3, 10)
-            };
-        }
-
-        public async Task<List<TeamData>> GetAllTeams()
-        {
-            var list = new List<TeamData>();
-            var response = await _httpApiProvider.GetResponse(ALL_TEAMS_ENDP);
-            var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
-
-            teamsList?.response?
-                .ToList()?
-                .ForEach(t => list.Add(new TeamData(t.team.name, t.team.id)));
-            return list;
-        }
-
-        private async Task<int?> GetTeamId(string name)
-        {
-            var response = await _httpApiProvider.GetResponse($"{GET_ID_ENDP}{name}");
-            var teamsList = JsonConvert.DeserializeObject<TeamsList>(response);
-            return teamsList?.response?.ToList()?.FirstOrDefault()?.team?.id;
         }
 
         public async Task<Fixture> TryGetFixtureByDate(string team, DateTime dateTime)
         {
-            var teamId = await GetTeamId(team);
+            var teamId = await _teamsService.GetTeamId(team);
             if (teamId == null)
             {
                 throw new KeyNotFoundException();
@@ -80,7 +48,7 @@ namespace FootballScoresApi.Api
 
         public async Task<List<Fixture>> TryGetLastFixtures(string team, int numberOfMatches)
         {
-            var teamId = await GetTeamId(team);
+            var teamId = await _teamsService.GetTeamId(team);
             if (teamId == null)
             {
                 throw new KeyNotFoundException();
@@ -112,18 +80,6 @@ namespace FootballScoresApi.Api
                 .ToList()?
                 .ForEach(s => list.Add(new TeamData(s.team.name, s.rank, s.points)));
             return list;
-        }
-
-        public async Task<List<PlayerDto>> GetAllPlayers(string teamName)
-        {
-            var response = await _httpApiProvider.GetResponse($"{PLAYERS_ENDP}?team=42");
-            var squads = JsonConvert.DeserializeObject<Squads>(response);
-            var players = squads.response?.FirstOrDefault()?.players;
-            if (players?.Any() ?? false)
-            {
-                return players.Select(p => _mapper.Map<PlayerDto>(p)).ToList();
-            }
-            return null;
         }
     }
 }
