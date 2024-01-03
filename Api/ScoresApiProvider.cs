@@ -11,8 +11,8 @@ namespace FootballScoresApi.Api
         private const string BASIC_URL = "https://api-football-v1.p.rapidapi.com/v3";
         private const string ALL_TEAMS_ENDP = $"{BASIC_URL}/teams?league=39&season=2020";
         private const string GET_ID_ENDP = $"{BASIC_URL}/teams?country={LEAGUE_ORIGIN}&name=";
-        private const string STANDINGS_ENDP = $"{BASIC_URL}/standings?season=2022&league=39";
-        private const string FIXTURE_FOR_DATE_ENDP = $"{BASIC_URL}/fixtures?season=2022&league=39";
+        private const string STANDINGS_ENDP = $"{BASIC_URL}/standings?season=2023&league=39";
+        private const string FIXTURE_FOR_DATE_ENDP = $"{BASIC_URL}/fixtures?season=2023&league=39";
         private const string LAST_FIXTURES_ENDP = $"{BASIC_URL}/fixtures?league=39";
         private const string PLAYERS_ENDP = $"{BASIC_URL}/players/squads";
         private const string LEAGUE_ORIGIN = "England";
