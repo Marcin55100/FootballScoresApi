@@ -29,11 +29,11 @@ options.WithOrigins("http://localhost:4200")
 .AllowAnyHeader());
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.ConfigureExceptionHandler();
 
