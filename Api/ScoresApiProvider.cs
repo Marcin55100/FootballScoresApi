@@ -25,9 +25,9 @@ namespace FootballScoresApi.Api
             _httpApiProvider = httpApiProvider;
         }
 
-        public async Task<Fixture> TryGetFixtureByDate(string team, DateTime dateTime)
+        public async Task<Fixture> TryGetFixtureByDate(string teamName, DateTime dateTime)
         {
-            var teamId = await _teamsService.GetTeamId(team);
+            var teamId = await _teamsService.GetTeamId(teamName);
             if (teamId == null)
             {
                 throw new KeyNotFoundException();
@@ -41,14 +41,14 @@ namespace FootballScoresApi.Api
             if (teams != null)
             {
                 var isHome = teams.home.id == teamId;
-                return new Fixture(team, isHome ? teams.away.name : teams.home.name, isHome, dateTime);
+                return new Fixture(teamName, isHome ? teams.away.name : teams.home.name, isHome, dateTime);
             }
             return null;
         }
 
-        public async Task<List<Fixture>> TryGetLastFixtures(string team, int numberOfMatches)
+        public async Task<List<Fixture>> TryGetLastFixtures(string teamName, int numberOfMatches)
         {
-            var teamId = await _teamsService.GetTeamId(team);
+            var teamId = await _teamsService.GetTeamId(teamName);
             if (teamId == null)
             {
                 throw new KeyNotFoundException();
@@ -61,7 +61,7 @@ namespace FootballScoresApi.Api
             fixtures?.response?.ToList()?.ForEach(f =>
             {
                 var isHome = f.teams.home.id == teamId;
-                fixtureList.Add(new Fixture(team, isHome ? f.teams.away.name : f.teams.home.name, isHome, f.fixture.date));
+                fixtureList.Add(new Fixture(teamName, isHome ? f.teams.away.name : f.teams.home.name, isHome, f.fixture.date));
             });
             return fixtureList.Any() ? fixtureList : null;
         }

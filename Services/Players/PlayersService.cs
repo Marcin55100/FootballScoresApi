@@ -24,7 +24,7 @@ namespace FootballScoresApi.Services
             _httpApiProvider = httpApiProvider;
         }
 
-        public async Task<List<PlayerDto>> GetAllPlayers(string teamName)
+        public async Task<List<PlayerDto>> GetAll(string teamName)
         {
             var teamId = await _teamsService.GetTeamId(teamName);
             if (teamId == null)

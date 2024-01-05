@@ -5,7 +5,7 @@ namespace FootballScoresApi.Api
     public interface IScoresApiProvider
     {
         Task<List<TeamData>> GetAllStandings();
-        Task<Fixture> TryGetFixtureByDate(string team, DateTime dateTime);
-        Task<List<Fixture>> TryGetLastFixtures(string team, int numberOfMatches);
+        Task<Fixture> TryGetFixtureByDate(string teamName, DateTime dateTime);
+        Task<List<Fixture>> TryGetLastFixtures(string teamName, int numberOfMatches);
     }
 }

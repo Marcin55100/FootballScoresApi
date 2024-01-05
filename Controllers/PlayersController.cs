@@ -7,19 +7,19 @@ namespace FootballScoresApi.Controllers
     [Route("api/[controller]")]
     public class PlayersController : ControllerBase
     {
-        private readonly ILogger<StandingsController> _logger;
+        private readonly ILogger<FixturesController> _logger;
         private readonly IPlayersService _playersService;
 
-        public PlayersController(ILogger<StandingsController> logger, IPlayersService playersService)
+        public PlayersController(ILogger<FixturesController> logger, IPlayersService playersService)
         {
             _logger = logger;
             _playersService = playersService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllFromTeam(string teamName)
+        public async Task<IActionResult> GetAll(string teamName)
         {
-            return Ok(await _playersService.GetAllPlayers(teamName));
+            return Ok(await _playersService.GetAll(teamName));
         }
     }
 }

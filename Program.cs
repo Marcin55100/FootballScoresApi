@@ -2,6 +2,7 @@ using FootballScoresApi.Api;
 using FootballScoresApi.ErrorHandlers;
 using FootballScoresApi.Helpers;
 using FootballScoresApi.Logger;
+using FootballScoresApi.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,9 @@ builder.Host.UseSerilog();
 // Add services to the container.
 
 builder.Services.AddScoped<IScoresApiProvider, ScoresApiProvider>();
+builder.Services.AddScoped<ITeamsService, TeamsService>();
+builder.Services.AddScoped<IPlayersService, PlayersService>();
+builder.Services.AddScoped<ISeasonsService, SeasonsService>();
 builder.Services.AddScoped<IHttpApiProvider, HttpApiProvider>();
 builder.Services.AddCors();
 builder.Services.AddControllers();

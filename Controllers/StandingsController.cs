@@ -1,11 +1,10 @@
 ﻿using FootballScoresApi.Api;
-using FootballScoresApi.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootballScoresApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class StandingsController : ControllerBase
     {
         private readonly ILogger<StandingsController> _logger;
@@ -21,30 +20,6 @@ namespace FootballScoresApi.Controllers
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _scoresApiProvider.GetAllStandings());
-        }
-
-        [HttpGet]
-        [Route("fixtures")]
-        public async Task<IActionResult> GetFixtureByDate(string team, DateTime dateTime)
-        {
-            var fixtures = await _scoresApiProvider.TryGetFixtureByDate(team, dateTime);
-            if (fixtures == null)
-            {
-                return NotFound();
-            }
-            return Ok(fixtures);
-        }
-
-        [HttpGet]
-        [Route("fixtures/last")]
-        public async Task<IActionResult> GetFixtureByDate(string team, int numberOfMatches)
-        {
-            var fixtures = await _scoresApiProvider.TryGetLastFixtures(team, numberOfMatches);
-            if (fixtures == null)
-            {
-                return NotFound();
-            }
-            return Ok(fixtures);
         }
     }
 }

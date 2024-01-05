@@ -4,6 +4,6 @@ namespace FootballScoresApi.Services
 {
     public interface IPlayersService
     {
-        Task<List<PlayerDto>> GetAllPlayers(string teamName);
+        Task<List<PlayerDto>> GetAll(string teamName);
     }
 }
