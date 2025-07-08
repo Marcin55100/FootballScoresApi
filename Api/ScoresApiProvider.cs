@@ -10,8 +10,8 @@ namespace FootballScoresApi.Api
 {
     public class ScoresApiProvider : IScoresApiProvider
     {
-        private const string STANDINGS_ENDP = $"{GlobalConsts.BASIC_URL}/standings?season=2023&league=39";
-        private const string FIXTURE_FOR_DATE_ENDP = $"{GlobalConsts.BASIC_URL}/fixtures?season=2023&league=39";
+        private const string STANDINGS_ENDP = $"{GlobalConsts.BASIC_URL}/standings?league=39";
+        private const string FIXTURE_FOR_DATE_ENDP = $"{GlobalConsts.BASIC_URL}/fixtures?season=2024&league=39";
         private const string LAST_FIXTURES_ENDP = $"{GlobalConsts.BASIC_URL}/fixtures?league=39";
 
         private readonly ITeamsService _teamsService;
@@ -46,7 +46,7 @@ namespace FootballScoresApi.Api
             return null;
         }
 
-        public async Task<List<Fixture>> TryGetLastFixtures(string teamName, int numberOfMatches)
+        public async Task<List<Fixture>> TryGetLastFixtures(string teamName, int numberOfMatches, int season)
         {
             var teamId = await _teamsService.GetTeamId(teamName);
             if (teamId == null)
@@ -55,7 +55,7 @@ namespace FootballScoresApi.Api
             }
 
             var fixtureList = new List<Fixture>();
-            var response = await _httpApiProvider.GetResponse($"{LAST_FIXTURES_ENDP}&team={teamId}&last={numberOfMatches}");
+            var response = await _httpApiProvider.GetResponse($"{LAST_FIXTURES_ENDP}&team={teamId}&last={numberOfMatches}&season={season}");
             var fixtures = JsonConvert.DeserializeObject<Fixtures>(response);
 
             fixtures?.response?.ToList()?.ForEach(f =>
@@ -67,10 +67,10 @@ namespace FootballScoresApi.Api
         }
 
 
-        public async Task<List<TeamData>> GetAllStandings()
+        public async Task<List<TeamData>> GetAllStandings(int season)
         {
             var list = new List<TeamData>();
-            var response = await _httpApiProvider.GetResponse(STANDINGS_ENDP);
+            var response = await _httpApiProvider.GetResponse($"{STANDINGS_ENDP}&season={season}");
             var teamsList = JsonConvert.DeserializeObject<Standings>(response);
 
             var league = teamsList?.response?.ToList().FirstOrDefault()?.league;

@@ -17,9 +17,9 @@ namespace FootballScoresApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int season)
         {
-            return Ok(await _scoresApiProvider.GetAllStandings());
+            return Ok(await _scoresApiProvider.GetAllStandings(season));
         }
     }
 }
