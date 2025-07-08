@@ -9,9 +9,8 @@ namespace FootballScoresApi.Services
 {
     public class TeamsService : ITeamsService
     {
-        private const string ALL_TEAMS_ENDP = $"{GlobalConsts.BASIC_URL}/teams?league=39&season=2020";
+        private const string ALL_TEAMS_ENDP = $"{GlobalConsts.BASIC_URL}/teams?league=39&season=2024";
         private const string GET_ID_ENDP = $"{GlobalConsts.BASIC_URL}/teams?country={GlobalConsts.LEAGUE_ORIGIN}&name=";
-
         private readonly ILogger<TeamsService> _logger;
         private readonly IHttpApiProvider _httpApiProvider;
 

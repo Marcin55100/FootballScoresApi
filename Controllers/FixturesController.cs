@@ -30,9 +30,9 @@ namespace FootballScoresApi.Controllers
 
         [HttpGet]
         [Route("last")]
-        public async Task<IActionResult> GetFixtureByDate(string teamName, int numberOfMatches)
+        public async Task<IActionResult> GetFixtureByDate(string teamName, int numberOfMatches, int season)
         {
-            var fixtures = await _scoresApiProvider.TryGetLastFixtures(teamName, numberOfMatches);
+            var fixtures = await _scoresApiProvider.TryGetLastFixtures(teamName, numberOfMatches, season);
             if (fixtures == null)
             {
                 return NotFound();
